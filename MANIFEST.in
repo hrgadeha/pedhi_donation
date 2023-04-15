@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include pedhi_donation *.css
+recursive-include pedhi_donation *.csv
+recursive-include pedhi_donation *.html
+recursive-include pedhi_donation *.ico
+recursive-include pedhi_donation *.js
+recursive-include pedhi_donation *.json
+recursive-include pedhi_donation *.md
+recursive-include pedhi_donation *.png
+recursive-include pedhi_donation *.py
+recursive-include pedhi_donation *.svg
+recursive-include pedhi_donation *.txt
+recursive-exclude pedhi_donation *.pyc
