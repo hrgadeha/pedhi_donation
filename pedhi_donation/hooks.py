@@ -29,7 +29,10 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Donation" : "public/js/donation.js",
+    "Non Profit Settings" : "public/js/non_profit_settings.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -102,13 +105,16 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Donation": {
+		"validate": "pedhi_donation.hook.donation.validate",
+		"on_submit": "pedhi_donation.hook.donation.on_submit",
+		"on_cancel": "pedhi_donation.hook.donation.on_cancel",
+	},
+	"Journal Entry": {
+		"on_cancel": "pedhi_donation.hook.journal_entry.on_cancel",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -190,3 +196,8 @@ app_license = "MIT"
 # auth_hooks = [
 #	"pedhi_donation.auth.validate"
 # ]
+
+fixtures = [
+    {"dt": "Custom Field", "filters": [["module", "=", "Pedhi Donation"]]},
+    {"dt": "Property Setter", "filters": [["module", "=", "Pedhi Donation"]]},
+]
