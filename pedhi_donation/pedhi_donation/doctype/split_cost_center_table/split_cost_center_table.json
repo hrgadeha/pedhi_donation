@@ -7,7 +7,8 @@
  "field_order": [
   "cost_center",
   "remarks",
-  "amount"
+  "amount",
+  "company"
  ],
  "fields": [
   {
@@ -32,12 +33,20 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount"
+  },
+  {
+   "fetch_from": "cost_center.company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-18 12:39:38.901432",
+ "modified": "2023-04-25 22:18:59.853694",
  "modified_by": "Administrator",
  "module": "Pedhi Donation",
  "name": "Split Cost Center Table",

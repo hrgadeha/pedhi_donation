@@ -8,5 +8,13 @@ frappe.ui.form.on("Non Profit Settings", {
 				}
 			}
 		})
+		frm.set_query('member_account', function(doc) {
+			return {
+				filters: {
+					'company': frm.doc.company,
+					'account_Type': 'Receivable'
+				}
+			}
+		})
 	}
 });

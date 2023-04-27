@@ -31,9 +31,13 @@ app_license = "MIT"
 # include js in doctype views
 doctype_js = {
     "Donation" : "public/js/donation.js",
+    "Membership Type" : "public/js/membership_type.js",
+    "Membership" : "public/js/membership.js",
     "Non Profit Settings" : "public/js/non_profit_settings.js"
 }
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+    "Membership" : "public/js/membership_list.js"
+}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -97,9 +101,9 @@ doctype_js = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Membership": "pedhi_donation.override_class.membership.CustomMembership"
+}
 
 # Document Events
 # ---------------
@@ -110,6 +114,12 @@ doc_events = {
 		"validate": "pedhi_donation.hook.donation.validate",
 		"on_submit": "pedhi_donation.hook.donation.on_submit",
 		"on_cancel": "pedhi_donation.hook.donation.on_cancel",
+	},
+	"Membership": {
+		"validate": "pedhi_donation.hook.membership.validate",
+	},
+	"Membership Type": {
+		"validate": "pedhi_donation.hook.membership_type.validate",
 	},
 	"Journal Entry": {
 		"on_cancel": "pedhi_donation.hook.journal_entry.on_cancel",
