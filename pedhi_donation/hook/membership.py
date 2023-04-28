@@ -146,7 +146,7 @@ def set_expired_status():
 			`tabMembership` SET `membership_status` = 'Expired'
 		WHERE
 			`membership_status` not in ('Cancelled') AND `to_date` < %s
-		""", (nowdate()))
+		""", (getdate()))
 
 def set_status_for_member():
 	all_member = frappe.db.get_all('Member', ['name', 'status'])
