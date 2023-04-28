@@ -35,9 +35,12 @@ doctype_js = {
     "Membership" : "public/js/membership.js",
     "Non Profit Settings" : "public/js/non_profit_settings.js"
 }
+
 doctype_list_js = {
-    "Membership" : "public/js/membership_list.js"
+    "Membership" : "public/js/membership_list.js",
+	"Member" : "public/js/member_list.js"
 }
+
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -124,6 +127,13 @@ doc_events = {
 	"Journal Entry": {
 		"on_cancel": "pedhi_donation.hook.journal_entry.on_cancel",
 	}
+}
+
+scheduler_events = {
+	"daily": [
+		"pedhi_donation.hook.membership.set_status_for_member",
+		"pedhi_donation.hook.membership.set_expired_status",
+	],
 }
 
 # Scheduled Tasks

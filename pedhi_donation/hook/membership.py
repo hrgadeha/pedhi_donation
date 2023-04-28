@@ -114,6 +114,7 @@ def create_split_cost_center_jv(membership_id):
 	jv.save()
 	jv.submit()
 	frappe.msgprint(_("{0} {1} created").format(jv.doctype, jv.name))
+	update_member_status(mem_doc)
 
 @frappe.whitelist()
 def cancel_journal_entry(membership_id):
@@ -132,3 +133,25 @@ def cancel_journal_entry(membership_id):
 
 	mem_doc.db_set('journal_entry', None)
 	mem_doc.db_set('membership_status', 'Unpaid')
+	update_member_status(mem_doc)
+
+def update_member_status(mem_doc):
+	membership_doc = frappe.get_last_doc('Membership', filters={"member": mem_doc.member})
+	if membership_doc.member and frappe.db.exists('Member', membership_doc.member):
+		frappe.db.set_value('Member', membership_doc.member, 'status', membership_doc.membership_status)
+
+def set_expired_status():
+	frappe.db.sql("""
+		UPDATE
+			`tabMembership` SET `membership_status` = 'Expired'
+		WHERE
+			`membership_status` not in ('Cancelled') AND `to_date` < %s
+		""", (nowdate()))
+
+def set_status_for_member():
+	all_member = frappe.db.get_all('Member', ['name', 'status'])
+	for member in all_member:
+		if frappe.db.exists('Member', member.name):
+			membership_doc = frappe.get_last_doc('Membership', filters={"member": member.name})
+			if membership_doc and member.status != membership_doc.membership_status:
+				frappe.db.set_value('Member', member.name, 'status', membership_doc.membership_status)

@@ -11,7 +11,7 @@ frappe.listview_settings['Membership'] = {
 		} else if (doc.membership_status === 'Paid') {
 			return [__('Paid'), 'green', 'membership_status,=,Paid'];
 		} else if (doc.membership_status === 'Unpaid') {
-			return [__('Unpaid'), 'orange', 'membership_status,=,Unpaid'];
+			return [__('Unpaid'), 'yellow', 'membership_status,=,Unpaid'];
 		} else {
 			return [__('Cancelled'), 'red', 'membership_status,=,Cancelled'];
 		}
