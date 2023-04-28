@@ -2,6 +2,7 @@ frappe.ui.form.on("Donation", {
 	onload(frm) {
 		if (frm.doc.__islocal) {
 			get_all_cost_Center(frm);
+			frm.set_value('date', frappe.datetime.get_today())
 		}
 	},
 	refresh(frm) {

@@ -3,9 +3,14 @@ from erpnext.accounts.party import get_party_account
 from frappe import _
 
 def validate(doc, method):
+	validate_amount(doc)
 	validate_repeating_cost_center(doc)
 	remove_zero_amount_cost_center(doc)
 	calculate_amount(doc)
+
+def validate_amount(doc):
+	if doc.amount <= 0:
+		frappe.throw('Amount can not be 0.')
 
 def validate_repeating_cost_center(doc):
 	"""Error when Same Company is entered multiple times in accounts"""

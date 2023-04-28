@@ -1,3 +1,16 @@
+frappe.ui.form.on('Membership Type', {
+	refresh: function(frm) {
+		frm.set_query("cost_center", "split_cost_center_table", function(doc, cdt, cdn) {
+			let d = locals[cdt][cdn];
+			return {
+				filters: [
+					['Cost Center', 'is_group', '=', 0],
+				]
+			};
+		});
+	},
+});
+
 frappe.ui.form.on("Split Cost Center Table", {
 	amount: function (frm, cdt, cdn) {
 		calculate_amount(frm);

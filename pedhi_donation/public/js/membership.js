@@ -24,6 +24,11 @@ frappe.ui.form.on("Membership", {
 			});
 		}
 	},
+	onload(frm) {
+		if (frm.doc.__islocal) {
+			frm.set_value('from_date', frappe.datetime.get_today())
+		}
+	},
 	membership_type(frm) {
 		get_membership_cost_Center(frm);
 	},
