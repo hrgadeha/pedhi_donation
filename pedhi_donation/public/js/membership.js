@@ -27,7 +27,7 @@ frappe.ui.form.on("Membership", {
 	onload(frm) {
 		if (frm.doc.__islocal) {
 			set_last_vocuher_date(frm);
-			frm.set_value("from_date", frappe.datetime.add_days(frappe.defaults.get_default("year_end_date"), 1));
+			frm.set_value("from_date", frappe.defaults.get_default("year_start_date"));
 		}
 	},
 	from_date: function(frm) {
