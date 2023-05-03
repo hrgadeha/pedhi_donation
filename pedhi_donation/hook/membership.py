@@ -156,7 +156,12 @@ def set_expired_status():
 def set_status_for_member():
 	all_member = frappe.db.get_all('Member', ['name', 'status'])
 	for member in all_member:
-		if frappe.db.exists('Member', member.name):
+		if frappe.db.exists('Member', member.name) and frappe.db.exists('Membership', filters={"member": member.name}):
 			membership_doc = frappe.get_last_doc('Membership', filters={"member": member.name})
 			if membership_doc and member.status != membership_doc.membership_status:
 				frappe.db.set_value('Member', member.name, 'status', membership_doc.membership_status)
+
+@frappe.whitelist()
+def get_last_vocuher_date():
+	last_membership_doc = frappe.get_last_doc('Membership')
+	return last_membership_doc.date

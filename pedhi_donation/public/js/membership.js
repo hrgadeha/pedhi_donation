@@ -26,8 +26,13 @@ frappe.ui.form.on("Membership", {
 	},
 	onload(frm) {
 		if (frm.doc.__islocal) {
-			frm.set_value('from_date', frappe.datetime.get_today())
+			set_last_vocuher_date(frm);
+			frm.set_value("from_date", frappe.datetime.add_days(frappe.defaults.get_default("year_end_date"), 1));
 		}
+	},
+	from_date: function(frm) {
+		let year_end_date = frappe.datetime.add_days(frappe.datetime.add_months(frm.doc.from_date, 12), -1);
+		frm.set_value("to_date", year_end_date);
 	},
 	membership_type(frm) {
 		get_membership_cost_Center(frm);
@@ -107,4 +112,18 @@ function calculate_amount(frm) {
 		amount += cost_centers[j].amount;
 	}
 	frm.set_value("amount", amount);
+}
+
+function set_last_vocuher_date(frm) {
+	frappe.call({
+		method: "pedhi_donation.hook.membership.get_last_vocuher_date",
+		callback(r) {
+			if (r.message) {
+				frm.set_value('date', r.message);
+			}
+			else{
+				frm.set_value('date', frappe.datetime.get_today())
+			}
+		}
+	});
 }

@@ -119,3 +119,8 @@ def cancel_jv(doc):
 			jv_doc.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
 			jv_doc.cancel()
 			frappe.msgprint(_("{0} {1} cancelled").format(jv_doc.doctype, jv_doc.name))
+
+@frappe.whitelist()
+def get_last_vocuher_date():
+	last_donation_doc = frappe.get_last_doc('Donation')
+	return last_donation_doc.date

@@ -1,8 +1,14 @@
 frappe.ui.form.on("Donation", {
 	onload(frm) {
-		if (frm.doc.__islocal) {
+		if (frm.doc.__islocal && !frm.doc.amended_from) {
 			get_all_cost_Center(frm);
-			frm.set_value('date', frappe.datetime.get_today())
+		}
+		if (frm.doc.__islocal) {
+			frappe.db.get_single_value("Non Profit Settings", "default_donor").then((value) => {
+				frm.set_value('donor', value)
+			});
+			frm.set_value('journal_entry', null)
+			set_last_vocuher_date(frm);
 		}
 	},
 	refresh(frm) {
@@ -67,4 +73,18 @@ function calculate_amount(frm) {
 		amount += cost_centers[j].amount;
 	}
 	frm.set_value("amount", amount);
+}
+
+function set_last_vocuher_date(frm) {
+	frappe.call({
+		method: "pedhi_donation.hook.donation.get_last_vocuher_date",
+		callback(r) {
+			if (r.message) {
+				frm.set_value('date', r.message);
+			}
+			else{
+				frm.set_value('date', frappe.datetime.get_today())
+			}
+		}
+	});
 }
