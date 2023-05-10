@@ -37,7 +37,7 @@ def calculate_amount(doc):
 	doc.amount = sum(obj.amount for obj in doc.split_cost_center_table)
 
 def auto_generate_remarks(doc):
-	doc.payment_id = 'Amount {0} received from Donor {1} against Memership ID {2}'.format(doc.amount, doc.member, doc.name)
+	doc.payment_id = 'Amount {0} received from Member {1} against Memership ID {2}'.format(doc.amount, doc.member, doc.name)
 
 @frappe.whitelist()
 def get_membership_cost_Center(company = None, membership_type = None):
@@ -62,7 +62,7 @@ def create_split_cost_center_jv(membership_id):
 	jv.company = mem_doc.company
 	jv.posting_date = getdate()
 	jv.mode_of_payment = mem_doc.mode_of_payment
-	jv.donation = mem_doc.name
+	jv.membership = mem_doc.name
 	jv.cheque_no = mem_doc.payment_id
 	jv.cheque_date = getdate()
 	mode_of_payment_type = frappe._dict(
