@@ -7,23 +7,23 @@ from frappe import _
 from frappe.query_builder.functions import Sum
 
 def execute(filters=None):
-	donation_entry = get_jv_entries(filters)
+	membership_entry = get_jv_entries(filters)
 	columns = get_column()
 	data = []
 
 	unique_id = 0
-	donation_list = []
+	membership_list = []
 
-	for jv in donation_entry:
-		if jv.donation not in donation_list:
+	for jv in membership_entry:
+		if jv.membership not in membership_list:
 			unique_id += 1
-			donation_list.append(jv.donation)
+			membership_list.append(jv.membership)
 
 		jv.update({
 			"unique_id" : unique_id,
 			"base_vch_type": 'Receipt',
 			"vocuher_type": 'Receipt',
-			"vch_no": jv.donation,
+			"vch_no": jv.membership,
 			"vch_date": jv.posting_date,
 			"ledger": jv.account,
 			"debit": jv.debit,
@@ -54,7 +54,7 @@ def get_column():
 		{"label": _("UNIQUE ID"), "fieldname": "unique_id", "fieldtype": "Int", "width": 100},
 		{"label": _("BASE VCH-TYPE"), "fieldname": "base_vch_type", "fieldtype": "Data", "width": 100},
 		{"label": _("VOUCHER TYPE"), "fieldname": "vocuher_type", "fieldtype": "Data", "width": 140},
-		{"label": _("VCH NO"), "fieldname": "vch_no", "fieldtype": "Link", "options": "Donation", "width": 190},
+		{"label": _("VCH NO"), "fieldname": "vch_no", "fieldtype": "Link", "options": "Membership", "width": 190},
 		{"label": _("VCH DATE"), "fieldname": "vch_date", "fieldtype": "Date","width": 120},
 		{"label": _("LEDGER"), "fieldname": "ledger", "fieldtype": "Link", "options": "Account", "width": 140},
 		{"label": _("DEBIT"), "fieldname": "debit", "fieldtype": "Currency", "width": 140},
@@ -76,7 +76,7 @@ def get_jv_entries(filters):
 		.left_join(jv_doc_account)
 		.on(jv_doc_account.parent == jv_doc.name)
 		.select(
-			jv_doc.donation,
+			jv_doc.membership,
 			jv_doc.posting_date,
 			jv_doc_account.account,
 			Sum(jv_doc_account.debit).as_("debit"),
@@ -85,13 +85,13 @@ def get_jv_entries(filters):
 			jv_doc.cheque_no
 		)
 		.where(
-			(jv_doc.donation != "" or jv_doc.donation != None) 
+			(jv_doc.membership != "" or jv_doc.membership != None) 
 			& (jv_doc.docstatus == 1)
 		)
 		.groupby(jv_doc_account.parent)
 		.groupby(jv_doc_account.account)
 		.groupby(jv_doc_account.credit)
-		.orderby(jv_doc.donation)
+		.orderby(jv_doc.membership)
 		.orderby(jv_doc_account.account)
 	)
 
