@@ -19,7 +19,8 @@ def execute(filters=None):
 			unique_id += 1
 			donation_list.append(jv.donation)
 
-		jv.update({
+		jv_debit = {}
+		jv_debit.update({
 			"unique_id" : unique_id,
 			"base_vch_type": 'Receipt',
 			"vocuher_type": 'Receipt',
@@ -27,25 +28,36 @@ def execute(filters=None):
 			"vch_date": jv.posting_date,
 			"ledger": jv.account,
 			"debit": jv.debit,
-			"credit": jv.credit,
-			"cost_center_debit": jv.debit,
-			"cost_center_credit": jv.credit,
+			"credit": 0,
 			"narration": jv.cheque_no,
+			"cost_category": "",
+			"cost_center": "",
 		})
 
-		if jv.debit > 0:
-			jv.update({
-				"cost_category": "",
-				"cost_center": "",
-			})
+		data.append(jv_debit)
 
-		else:
-			jv.update({
-				"cost_category": 'primary cost category',
-				"cost_center": jv.cost_center,
-			})
+		if jv.name:
+			jv_doc_data = frappe.get_doc('Journal Entry', jv.name)
+			for acc in jv_doc_data.accounts:
+				if acc.credit > 0:
+					jv_credit = {}
+					jv_credit.update({
+						"unique_id" : unique_id,
+						"base_vch_type": 'Receipt',
+						"vocuher_type": 'Receipt',
+						"vch_no": jv_doc_data.donation,
+						"vch_date": jv_doc_data.posting_date,
+						"ledger": acc.account,
+						"debit": 0,
+						"credit": acc.credit,
+						"narration": jv_doc_data.cheque_no,
+						"cost_category": "primary cost category",
+						"cost_center": acc.cost_center,
+						"cost_center_debit": acc.debit,
+						"cost_center_credit": acc.credit,
+					})
 
-		data.append(jv)
+					data.append(jv_credit)
 			
 	return columns, data
 
@@ -76,21 +88,20 @@ def get_jv_entries(filters):
 		.left_join(jv_doc_account)
 		.on(jv_doc_account.parent == jv_doc.name)
 		.select(
+			jv_doc.name,
 			jv_doc.donation,
 			jv_doc.posting_date,
 			jv_doc_account.account,
 			Sum(jv_doc_account.debit).as_("debit"),
-			jv_doc_account.credit,
-			jv_doc_account.cost_center,
 			jv_doc.cheque_no
 		)
 		.where(
 			(jv_doc.donation != "" or jv_doc.donation != None) 
 			& (jv_doc.docstatus == 1)
+			& (jv_doc_account.debit > 0)
 		)
-		.groupby(jv_doc_account.parent)
+		.groupby(jv_doc.name)
 		.groupby(jv_doc_account.account)
-		.groupby(jv_doc_account.credit)
 		.orderby(jv_doc.donation)
 		.orderby(jv_doc_account.account)
 	)
