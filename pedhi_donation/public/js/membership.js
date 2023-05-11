@@ -78,6 +78,8 @@ function create_journal_entry(frm) {
 		args: {
 			membership_id : frm.doc.name,
 		},
+		freeze: true,
+		freeze_message: __("Creating..."),
 		callback(r) {
 			frm.reload_doc();
 		}
@@ -90,6 +92,8 @@ function cancel_journal_entry(frm) {
 		args: {
 			membership_id : frm.doc.name,
 		},
+		freeze: true,
+		freeze_message: __("Cancelling..."),
 		callback(r) {
 			frm.reload_doc();
 		}
