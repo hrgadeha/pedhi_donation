@@ -32,6 +32,8 @@ def execute(filters=None):
 			"narration": jv.cheque_no,
 			"cost_category": "",
 			"cost_center": "",
+			"cost_center_debit": jv.debit,
+			"cost_center_credit": 0,
 		})
 
 		data.append(jv_debit)
@@ -53,7 +55,7 @@ def execute(filters=None):
 						"narration": jv_doc_data.cheque_no,
 						"cost_category": "primary cost category",
 						"cost_center": acc.cost_center,
-						"cost_center_debit": acc.debit,
+						"cost_center_debit": 0,
 						"cost_center_credit": acc.credit,
 					})
 
