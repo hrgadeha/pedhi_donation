@@ -53,7 +53,7 @@ def create_split_cost_center_jv(doc):
 	if doc.mode_of_payment and mode_of_payment_type.get(doc.mode_of_payment) == "Cash":
 		jv.voucher_type = "Cash Entry"
 
-	party_account = frappe.db.get_single_value("Non Profit Settings", "donor_account")
+	party_account = frappe.db.get_value("Company", doc.company, "donor_account")
 
 	payment_account = frappe.db.get_value('Mode of Payment Account', {
 		'parent': doc.mode_of_payment,
@@ -63,7 +63,7 @@ def create_split_cost_center_jv(doc):
 	mode_of_payment_link = frappe.utils.get_link_to_form("Mode of Payment", doc.mode_of_payment)
 
 	if not party_account:
-		frappe.throw('Please Setup party account first in <b>Non Profit Settings</b>')
+		frappe.throw('Please Setup party account first in <b>Company Data</b>')
 
 	if not payment_account:
 		frappe.throw('Please Setup default mode of payment account first {0}'.format(mode_of_payment_link))

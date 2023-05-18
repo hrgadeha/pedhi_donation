@@ -33,7 +33,7 @@ doctype_js = {
     "Donation" : "public/js/donation.js",
     "Membership Type" : "public/js/membership_type.js",
     "Membership" : "public/js/membership.js",
-    "Non Profit Settings" : "public/js/non_profit_settings.js"
+    "Company" : "public/js/company.js"
 }
 
 doctype_list_js = {
