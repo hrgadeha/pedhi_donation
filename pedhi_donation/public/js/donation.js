@@ -27,6 +27,7 @@ frappe.ui.form.on("Donation", {
 				frappe.set_route("query-report", "General Ledger");
 			});
 		}
+		hide_naming_fields(frm);
 	},
 	company(frm) {
 		get_all_cost_Center(frm);
@@ -85,6 +86,19 @@ function set_last_vocuher_date(frm) {
 			else{
 				frm.set_value('date', frappe.datetime.get_today())
 			}
+		}
+	});
+}
+
+function hide_naming_fields(frm) {
+	frappe.db.get_single_value("Non Profit Settings", "donation_naming_setting").then((value) => {
+		if(value == 'Naming Series'){
+			frm.set_df_property('user_choice_name',  'hidden', 1);
+			frm.set_df_property('naming_series',  'hidden', 0);
+		}
+		if(value == 'User Choice'){
+			frm.set_df_property('user_choice_name',  'hidden', 0);
+			frm.set_df_property('naming_series',  'hidden', 1);
 		}
 	});
 }

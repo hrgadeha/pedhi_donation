@@ -179,7 +179,11 @@ def cancel_journal_entry(membership_id):
 def update_member_status(mem_doc):
 	membership_doc = frappe.get_last_doc('Membership', filters={"member": mem_doc.member})
 	if membership_doc.member and frappe.db.exists('Member', membership_doc.member):
-		frappe.db.set_value('Member', membership_doc.member, 'status', membership_doc.membership_status)
+		frappe.db.set_value('Member', membership_doc.member, {
+			'status' : membership_doc.membership_status,
+			'lr_no' : membership_doc.name,
+			'lr_date' : membership_doc.date
+		})
 
 def set_expired_status():
 	frappe.db.sql("""

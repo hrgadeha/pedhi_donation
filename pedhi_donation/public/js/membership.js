@@ -23,6 +23,7 @@ frappe.ui.form.on("Membership", {
 				cancel_journal_entry(frm);
 			});
 		}
+		hide_naming_fields(frm);
 	},
 	onload(frm) {
 		if (frm.doc.__islocal) {
@@ -128,6 +129,17 @@ function set_last_vocuher_date(frm) {
 			else{
 				frm.set_value('date', frappe.datetime.get_today())
 			}
+		}
+	});
+}
+
+function hide_naming_fields(frm) {
+	frappe.db.get_single_value("Non Profit Settings", "membership_naming_setting").then((value) => {
+		if(value == 'Naming Series'){
+			frm.set_df_property('user_choice_name',  'hidden', 1);
+		}
+		if(value == 'User Choice'){
+			frm.set_df_property('user_choice_name',  'hidden', 0);
 		}
 	});
 }
