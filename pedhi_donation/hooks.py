@@ -105,7 +105,8 @@ doctype_list_js = {
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Membership": "pedhi_donation.override_class.membership.CustomMembership"
+	"Membership": "pedhi_donation.override_class.membership.CustomMembership",
+	"Journal Entry": "pedhi_donation.override_class.journal_entry.CustomJournalEntry"
 }
 
 # Document Events
@@ -118,6 +119,7 @@ doc_events = {
 		"validate": "pedhi_donation.hook.donation.validate",
 		"on_submit": "pedhi_donation.hook.donation.on_submit",
 		"on_cancel": "pedhi_donation.hook.donation.on_cancel",
+		"on_trash": "pedhi_donation.hook.donation.on_trash",
 	},
 	"Membership": {
 		"autoname": "pedhi_donation.hook.membership.autoname",
@@ -127,7 +129,7 @@ doc_events = {
 		"validate": "pedhi_donation.hook.membership_type.validate",
 	},
 	"Journal Entry": {
-		"validate": "pedhi_donation.hook.journal_entry.validate",
+		"on_update": "pedhi_donation.hook.journal_entry.validate",
 		"on_cancel": "pedhi_donation.hook.journal_entry.on_cancel",
 	}
 }

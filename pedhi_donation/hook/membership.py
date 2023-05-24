@@ -59,20 +59,20 @@ def create_cash_narration(doc):
 	if doc.name:
 		doc.payment_id += '{0} '.format(doc.name)
 	if doc.member_name:
-		doc.payment_id += ': {0} '.format(doc.member_name)
+		doc.payment_id += ', {0} '.format(doc.member_name)
 	if doc.remarks:
-		doc.payment_id += ': {0}'.format(doc.remarks)
+		doc.payment_id += ', {0}'.format(doc.remarks)
 
 def create_bank_narration(doc):
 	doc.payment_id = ''
 	if doc.name:
 		doc.payment_id += '{0} '.format(doc.name)
 	if doc.chque_no:
-		doc.payment_id += ': {0} '.format(doc.chque_no)
+		doc.payment_id += ', {0} '.format(doc.chque_no)
 	if doc.bank:
-		doc.payment_id += ': {0} '.format(doc.bank)
+		doc.payment_id += ', {0} '.format(doc.bank)
 	if doc.remarks:
-		doc.payment_id += ': {0}'.format(doc.remarks)
+		doc.payment_id += ', {0}'.format(doc.remarks)
 
 @frappe.whitelist()
 def get_membership_cost_Center(company = None, membership_type = None):
@@ -99,7 +99,7 @@ def create_split_cost_center_jv(membership_id):
 	jv.mode_of_payment = mem_doc.mode_of_payment
 	jv.membership = mem_doc.name
 	jv.cheque_no = mem_doc.chque_no
-	jv.cheque_date = getdate(mem_doc.chque_date)
+	jv.cheque_date = getdate(mem_doc.chque_date) if mem_doc.chque_no else ""
 	jv.remark = mem_doc.payment_id
 	mode_of_payment_type = frappe._dict(
 		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)

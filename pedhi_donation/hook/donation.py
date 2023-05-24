@@ -53,20 +53,20 @@ def create_cash_narration(doc):
 	if doc.name:
 		doc.payment_id += '{0} '.format(doc.name)
 	if doc.donor_name_for_receipt:
-		doc.payment_id += ': {0} '.format(doc.donor_name_for_receipt)
+		doc.payment_id += ', {0} '.format(doc.donor_name_for_receipt)
 	if doc.remark:
-		doc.payment_id += ': {0}'.format(doc.remark)
+		doc.payment_id += ', {0}'.format(doc.remark)
 
 def create_bank_narration(doc):
 	doc.payment_id = ''
 	if doc.name:
 		doc.payment_id += '{0} '.format(doc.name)
 	if doc.cheque_no:
-		doc.payment_id += ': {0} '.format(doc.cheque_no)
+		doc.payment_id += ', {0} '.format(doc.cheque_no)
 	if doc.bank:
-		doc.payment_id += ': {0} '.format(doc.bank)
+		doc.payment_id += ', {0} '.format(doc.bank)
 	if doc.remark:
-		doc.payment_id += ': {0}'.format(doc.remark)
+		doc.payment_id += ', {0}'.format(doc.remark)
 
 def on_submit(doc, method):
 	if doc.amount > 0:
@@ -79,7 +79,7 @@ def create_split_cost_center_jv(doc):
 	jv.mode_of_payment = doc.mode_of_payment
 	jv.donation = doc.name
 	jv.cheque_no = doc.cheque_no
-	jv.cheque_date = doc.date
+	jv.cheque_date = doc.date if doc.cheque_no else ""
 	jv.remark = doc.payment_id
 	mode_of_payment_type = frappe._dict(
 		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)
@@ -134,6 +134,11 @@ def create_split_cost_center_jv(doc):
 	jv.save()
 	jv.submit()
 	frappe.msgprint(_("{0} {1} created").format(jv.doctype, jv.name))
+
+def on_trash(doc, method):
+	frappe.db.sql("""delete from `tabJournal Entry` where name = '{0}';""".format(doc.journal_entry))
+	frappe.db.sql("""delete from `tabGL Entry` where voucher_no = '{0}';""".format(doc.journal_entry))
+	frappe.db.sql("""delete from `tabPayment Ledger Entry` where voucher_no = '{0}';""".format(doc.journal_entry))
 
 @frappe.whitelist()
 def get_cost_center(company = None):

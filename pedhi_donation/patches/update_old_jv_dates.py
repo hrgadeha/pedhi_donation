@@ -7,3 +7,5 @@ def execute():
 			frappe.db.set_value('Journal Entry', membership.journal_entry, 'posting_date', membership.date)
 			frappe.db.sql("""update `tabGL Entry` set posting_date = '{0}'
 				where voucher_no = '{1}';""".format(membership.date,membership.journal_entry))
+			frappe.db.sql("""update `tabPayment Ledger Entry` set posting_date = '{0}'
+				where voucher_no = '{1}';""".format(membership.date,membership.journal_entry))
