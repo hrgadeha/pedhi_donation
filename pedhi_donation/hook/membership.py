@@ -3,6 +3,13 @@ from erpnext.accounts.party import get_party_account
 from frappe import _
 from frappe.utils import getdate
 
+def autoname(doc, method):
+	if frappe.db.get_single_value("Non Profit Settings", "membership_naming_setting") == 'User Choice':
+		if not doc.user_choice_name:
+			frappe.throw('Please add value in Field <b>User Choice Name</b> to create autoname of this membership')
+		else:
+			doc.name = doc.user_choice_name
+
 def validate(doc, method):
 	validate_amount(doc)
 	validate_repeating_cost_center(doc)
@@ -37,7 +44,35 @@ def calculate_amount(doc):
 	doc.amount = sum(obj.amount for obj in doc.split_cost_center_table)
 
 def auto_generate_remarks(doc):
-	doc.payment_id = 'Amount {0} received from Member {1} against Memership ID {2}'.format(doc.amount, doc.member, doc.name)
+	mode_of_payment_type = frappe._dict(
+		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)
+	)
+	if doc.mode_of_payment:
+		if mode_of_payment_type.get(doc.mode_of_payment) == "Cash":
+			create_cash_narration(doc)
+
+		if mode_of_payment_type.get(doc.mode_of_payment) == "Bank":
+			create_bank_narration(doc)
+
+def create_cash_narration(doc):
+	doc.payment_id = ''
+	if doc.name:
+		doc.payment_id += '{0} '.format(doc.name)
+	if doc.member_name:
+		doc.payment_id += ': {0} '.format(doc.member_name)
+	if doc.remarks:
+		doc.payment_id += ': {0}'.format(doc.remarks)
+
+def create_bank_narration(doc):
+	doc.payment_id = ''
+	if doc.name:
+		doc.payment_id += '{0} '.format(doc.name)
+	if doc.chque_no:
+		doc.payment_id += ': {0} '.format(doc.chque_no)
+	if doc.bank:
+		doc.payment_id += ': {0} '.format(doc.bank)
+	if doc.remarks:
+		doc.payment_id += ': {0}'.format(doc.remarks)
 
 @frappe.whitelist()
 def get_membership_cost_Center(company = None, membership_type = None):
@@ -60,11 +95,12 @@ def create_split_cost_center_jv(membership_id):
 
 	jv = frappe.new_doc('Journal Entry')
 	jv.company = mem_doc.company
-	jv.posting_date = getdate()
+	jv.posting_date = getdate(mem_doc.date)
 	jv.mode_of_payment = mem_doc.mode_of_payment
 	jv.membership = mem_doc.name
-	jv.cheque_no = mem_doc.payment_id
-	jv.cheque_date = getdate()
+	jv.cheque_no = mem_doc.chque_no
+	jv.cheque_date = getdate(mem_doc.chque_date)
+	jv.remark = mem_doc.payment_id
 	mode_of_payment_type = frappe._dict(
 		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)
 	)
@@ -156,10 +192,14 @@ def set_expired_status():
 def set_status_for_member():
 	all_member = frappe.db.get_all('Member', ['name', 'status'])
 	for member in all_member:
-		if frappe.db.exists('Member', member.name) and frappe.db.exists('Membership', filters={"member": member.name}):
-			membership_doc = frappe.get_last_doc('Membership', filters={"member": member.name})
+		if frappe.db.exists('Member', member.name) and frappe.db.exists('Membership', {"member": member.name}):
+			membership_doc = frappe.get_last_doc('Membership', {"member": member.name})
 			if membership_doc and member.status != membership_doc.membership_status:
-				frappe.db.set_value('Member', member.name, 'status', membership_doc.membership_status)
+				frappe.db.set_value('Member', member.name, {
+					'status' : membership_doc.membership_status,
+					'lr_no' : membership_doc.name,
+					'lr_date' : membership_doc.date
+				})
 
 @frappe.whitelist()
 def get_last_vocuher_date():

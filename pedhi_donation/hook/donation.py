@@ -2,6 +2,13 @@ import frappe
 from erpnext.accounts.party import get_party_account
 from frappe import _
 
+def autoname(doc, method):
+	if frappe.db.get_single_value("Non Profit Settings", "donation_naming_setting") == 'User Choice':
+		if not doc.user_choice_name:
+			frappe.throw('Please add value in Field <b>User Choice Name</b> to create autoname of this membership')
+		else:
+			doc.name = doc.user_choice_name
+
 def validate(doc, method):
 	validate_repeating_cost_center(doc)
 	remove_zero_amount_cost_center(doc)
@@ -31,7 +38,35 @@ def calculate_amount(doc):
 	doc.amount = sum(obj.amount for obj in doc.split_cost_center_table)
 
 def auto_generate_remarks(doc):
-	doc.payment_id = 'Amount {0} received from Donor {1} against Donation ID {2}'.format(doc.amount, doc.donor, doc.name)
+	mode_of_payment_type = frappe._dict(
+		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)
+	)
+	if doc.mode_of_payment:
+		if mode_of_payment_type.get(doc.mode_of_payment) == "Cash":
+			create_cash_narration(doc)
+
+		if mode_of_payment_type.get(doc.mode_of_payment) == "Bank":
+			create_bank_narration(doc)
+
+def create_cash_narration(doc):
+	doc.payment_id = ''
+	if doc.name:
+		doc.payment_id += '{0} '.format(doc.name)
+	if doc.donor_name_for_receipt:
+		doc.payment_id += ': {0} '.format(doc.donor_name_for_receipt)
+	if doc.remark:
+		doc.payment_id += ': {0}'.format(doc.remark)
+
+def create_bank_narration(doc):
+	doc.payment_id = ''
+	if doc.name:
+		doc.payment_id += '{0} '.format(doc.name)
+	if doc.cheque_no:
+		doc.payment_id += ': {0} '.format(doc.cheque_no)
+	if doc.bank:
+		doc.payment_id += ': {0} '.format(doc.bank)
+	if doc.remark:
+		doc.payment_id += ': {0}'.format(doc.remark)
 
 def on_submit(doc, method):
 	if doc.amount > 0:
@@ -43,8 +78,9 @@ def create_split_cost_center_jv(doc):
 	jv.posting_date = doc.date
 	jv.mode_of_payment = doc.mode_of_payment
 	jv.donation = doc.name
-	jv.cheque_no = doc.payment_id
+	jv.cheque_no = doc.cheque_no
 	jv.cheque_date = doc.date
+	jv.remark = doc.payment_id
 	mode_of_payment_type = frappe._dict(
 		frappe.get_all("Mode of Payment", fields=["name", "type"], as_list=1)
 	)

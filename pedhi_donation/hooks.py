@@ -114,17 +114,20 @@ override_doctype_class = {
 
 doc_events = {
 	"Donation": {
+		"autoname": "pedhi_donation.hook.donation.autoname",
 		"validate": "pedhi_donation.hook.donation.validate",
 		"on_submit": "pedhi_donation.hook.donation.on_submit",
 		"on_cancel": "pedhi_donation.hook.donation.on_cancel",
 	},
 	"Membership": {
+		"autoname": "pedhi_donation.hook.membership.autoname",
 		"validate": "pedhi_donation.hook.membership.validate",
 	},
 	"Membership Type": {
 		"validate": "pedhi_donation.hook.membership_type.validate",
 	},
 	"Journal Entry": {
+		"validate": "pedhi_donation.hook.journal_entry.validate",
 		"on_cancel": "pedhi_donation.hook.journal_entry.on_cancel",
 	}
 }
