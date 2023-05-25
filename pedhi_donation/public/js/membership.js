@@ -23,6 +23,11 @@ frappe.ui.form.on("Membership", {
 				cancel_journal_entry(frm);
 			});
 		}
+		if(!frm.doc.__islocal){
+			let payment_id = (frm.doc.payment_id).replace(/^[^,]+/, frm.doc.name);;
+			frm.doc.payment_id = payment_id;
+			frm.refresh_fields('payment_id')
+		}
 		hide_naming_fields(frm);
 	},
 	onload(frm) {

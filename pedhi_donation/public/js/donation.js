@@ -27,6 +27,11 @@ frappe.ui.form.on("Donation", {
 				frappe.set_route("query-report", "General Ledger");
 			});
 		}
+		if(!frm.doc.__islocal){
+			let payment_id = (frm.doc.payment_id).replace(/^[^,]+/, frm.doc.name);;
+			frm.doc.payment_id = payment_id;
+			frm.refresh_fields('payment_id')
+		}
 		hide_naming_fields(frm);
 	},
 	company(frm) {
