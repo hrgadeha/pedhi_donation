@@ -2,6 +2,7 @@ import frappe
 from erpnext.accounts.party import get_party_account
 from frappe import _
 from frappe.utils import getdate
+from frappe.utils import money_in_words
 
 def autoname(doc, method):
 	if frappe.db.get_single_value("Non Profit Settings", "membership_naming_setting") == 'User Choice':
@@ -42,6 +43,7 @@ def remove_zero_amount_cost_center(doc):
 
 def calculate_amount(doc):
 	doc.amount = sum(obj.amount for obj in doc.split_cost_center_table)
+	doc.in_words = money_in_words(doc.amount)
 
 def auto_generate_remarks(doc):
 	mode_of_payment_type = frappe._dict(

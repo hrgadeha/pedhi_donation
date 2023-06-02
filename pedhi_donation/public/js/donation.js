@@ -34,6 +34,11 @@ frappe.ui.form.on("Donation", {
 		}
 		hide_naming_fields(frm);
 	},
+	donor(frm) {
+		if(frm.doc.donor){
+			set_pan_attachment(frm);
+		}
+	},
 	company(frm) {
 		get_all_cost_Center(frm);
 	},
@@ -104,6 +109,22 @@ function hide_naming_fields(frm) {
 		if(value == 'User Choice'){
 			frm.set_df_property('user_choice_name',  'hidden', 0);
 			frm.set_df_property('naming_series',  'hidden', 1);
+		}
+	});
+}
+
+function set_pan_attachment(frm) {
+	frappe.call({
+		method: 'pedhi_donation.hook.donation.fetch_pan_attachment',
+		args: {
+			donor: frm.doc.donor
+		},
+		callback: function(response) {
+			if (response.message) {
+				// Set the fetched attachments to the PAN No and Aadhar No field in Donation
+				frm.set_value('upload_pan', response.message.upload_pan);
+				frm.set_value('upload_aadhar', response.message.upload_aadhar);
+			}
 		}
 	});
 }

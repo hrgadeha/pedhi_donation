@@ -1,6 +1,7 @@
 import frappe
 from erpnext.accounts.party import get_party_account
 from frappe import _
+from frappe.utils import money_in_words
 
 def autoname(doc, method):
 	if frappe.db.get_single_value("Non Profit Settings", "donation_naming_setting") == 'User Choice':
@@ -14,6 +15,7 @@ def validate(doc, method):
 	remove_zero_amount_cost_center(doc)
 	calculate_amount(doc)
 	auto_generate_remarks(doc)
+	update_donor_details(doc)
 
 def validate_repeating_cost_center(doc):
 	"""Error when Same Company is entered multiple times in accounts"""
@@ -36,6 +38,7 @@ def remove_zero_amount_cost_center(doc):
 
 def calculate_amount(doc):
 	doc.amount = sum(obj.amount for obj in doc.split_cost_center_table)
+	doc.in_words = money_in_words(doc.amount)
 
 def auto_generate_remarks(doc):
 	mode_of_payment_type = frappe._dict(
@@ -47,6 +50,17 @@ def auto_generate_remarks(doc):
 
 		if mode_of_payment_type.get(doc.mode_of_payment) == "Bank":
 			create_bank_narration(doc)
+
+def update_donor_details(doc):
+	if doc.donor and frappe.db.exists('Donor', doc.donor):
+		frappe.db.set_value('Donor', doc.donor, {
+			'pan_no' : doc.pan_no,
+			'aadhar_no' : doc.aadhar_no,
+			'mobile' : doc.mobile,
+			'address' : doc.address,
+			'upload_pan' : doc.upload_pan,
+			'upload_aadhar' : doc.upload_aadhar
+		})
 
 def create_cash_narration(doc):
 	doc.payment_id = ''
@@ -165,3 +179,10 @@ def cancel_jv(doc):
 def get_last_vocuher_date():
 	last_donation_doc = frappe.get_last_doc('Donation')
 	return last_donation_doc.date
+
+@frappe.whitelist()
+def fetch_pan_attachment(donor):
+    # Fetch the PAN attachment from the Donor doctype
+    donor_attachment = frappe.db.get_value('Donor', donor, ['upload_pan','upload_aadhar'], as_dict = True)
+
+    return donor_attachment
